@@ -45,6 +45,7 @@ function destroy(req, res, next) {
 function hasDeliverTo(req, res, next) {
   const { data: {deliverTo } = {} } = req.body;
   if(deliverTo) {
+    res.locals.deliverTo = deliverTo;
     return next();
   }
   next({ status: 400, message: "Order must include a deliverTo" })
@@ -53,6 +54,7 @@ function hasDeliverTo(req, res, next) {
 function hasMobileNumber(req, res, next) {
   const { data: { mobileNumber } = {} } = req.body;
   if(mobileNumber) {
+    res.locals.mobileNumber = mobileNumber;
     return next();
   }
   next({ status: 400, message: "Order must include a mobileNumber" })
@@ -65,6 +67,7 @@ function hasStatus(req, res, next) {
   } else if(status === "invalid") {
     next({ status: 400, message: "Order must have a status of pending, preparing, out-for-delivery, delivered" })
   }
+  res.locals.status = status;
   return next();
 }
 
@@ -77,6 +80,7 @@ function hasDishes(req, res, next) {
   } else if(dishes.length === 0) {
     next({ status: 400, message: "Order must include at least one dish" });
   } else {
+    res.locals.dishes = dishes;
     return next();
   }
 }
@@ -90,6 +94,7 @@ function hasQuantity(req, res, next) {
       next({ status: 400, message: `Dish ${dishes.indexOf(dish)} must have a quantity that is an integer greater than 0` })
     };
   })
+  res.locals.dishes = dishes;
   next();
 };
 
@@ -118,8 +123,10 @@ function ifOrderId(req, res, next) {
   const orderId = req.params.orderId;
   const { data: { id } = {} } = req.body;
   if(!id) {
+    res.locals.id = id;
     next();
   } else if(id === orderId) {
+    res.locals.orderId = orderId;
     next();
   } else{
     next({ status: 400, message: `Order id does not match route id. Order: ${id}, Route: ${orderId}` })

@@ -30,6 +30,7 @@ function hasName(req, res, next) {
   const { data: { name } = {} } = req.body;
   
   if(name) {
+    res.locals.name = name;
     return next()
   }
   next({ status: 400, message: "Dish must include a name" });
@@ -39,6 +40,7 @@ function hasDescription(req, res, next) {
   const { data: { description } = {} } = req.body;
   
   if(description && description !== "") {
+    res.locals.description = description;
     return next();
   }
   next({ status: 400, message: "Dish must include a description" });
@@ -54,6 +56,7 @@ function hasPrice(req, res, next) {
   } else if(price < 0) {
     next({ status: 400, message: "Dish must include a price that is an integer greater than 0" });
   } else {
+    res.locals.price = price;
     return next();
   }
 };
@@ -62,6 +65,7 @@ function hasImage(req, res, next) {
   const { data: { image_url } = {} } = req.body;
   
   if(image_url){
+    res.locals.image_url = image_url
     return next()
   }
   next({ status: 400, message: "Dish must include an image_url" });
@@ -84,8 +88,10 @@ function ifDishId(req, res, next) {
   const dishId = req.params.dishId;
   const { data: { id } = {} } = req.body;
   if(!id) {
+    res.locals.id = id;
     next()
   } else if (id === dishId) {
+    res.locals.dishId = dishId;
     next();
   } else {
     next({ status: 400, message: `Dish id does not match route id. Dish: ${id}, Route: ${dishId}`});
@@ -113,7 +119,6 @@ function update(req, res, next) {
   
   const { data: { id, name, description, price, image_url } = {} } = req.body;
   
-  foundDish.id = `${dishId}`;
   foundDish.name = name;
   foundDish.description = description;
   foundDish.price = price;
